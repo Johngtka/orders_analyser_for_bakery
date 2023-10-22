@@ -1,18 +1,19 @@
 import sys
 import pymysql
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QTableWidget, QTableWidgetItem, QFrame
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QTableWidget, QTableWidgetItem, QFrame, QHeaderView
 
 class OrderAnalyzerApp(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Analiza Zamówień")
+        self.setWindowTitle("Orders Analyzer")
         self.setGeometry(100, 100, 600, 400)
 
-        self.analyze_button = QPushButton("Analizuj Zamówienia")
+        self.analyze_button = QPushButton("Analyze Orders")
         self.table = QTableWidget()
         self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["Imię", "Nazwisko", "Email", "Liczba zamówień"])
+        self.table.setHorizontalHeaderLabels(["Name", "Surname", "Email", "Order Count"])
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         
         frame = QFrame(self)  # Tworzenie pojemnika na elementy
         frame.setLayout(QVBoxLayout())  # Ustawienie układu w pojemniku
