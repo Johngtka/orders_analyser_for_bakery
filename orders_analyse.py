@@ -1,5 +1,6 @@
 import sys
 import pymysql
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QTableWidget, QTableWidgetItem, QFrame, QHeaderView
 
 class OrderAnalyzerApp(QWidget):
@@ -12,8 +13,12 @@ class OrderAnalyzerApp(QWidget):
         self.analyze_button = QPushButton("Analyze Orders")
         self.table = QTableWidget()
         self.table.setColumnCount(4)
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setSelectionMode(QTableWidget.MultiSelection)  
         self.table.setHorizontalHeaderLabels(["Name", "Surname", "Email", "Order Count"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.setFocusPolicy(Qt.NoFocus)
+        self.table.horizontalHeader().setHighlightSections(False)
         
         frame = QFrame(self)  # Tworzenie pojemnika na elementy
         frame.setLayout(QVBoxLayout())  # Ustawienie układu w pojemniku
@@ -26,6 +31,7 @@ class OrderAnalyzerApp(QWidget):
 
         self.analyze_button.clicked.connect(self.analyze_orders)
 
+    
     def analyze_orders(self):
         self.analyze_button.setEnabled(False)
         
@@ -57,7 +63,9 @@ class OrderAnalyzerApp(QWidget):
                 for row, data in enumerate(results):
                     self.table.insertRow(row)
                     for col, item in enumerate(data):
-                        self.table.setItem(row, col, QTableWidgetItem(str(item)))
+                        item = QTableWidgetItem(str(item))  # Dodaj przecinek
+                        item.setFlags(item.flags() ^ Qt.ItemIsEditable)  # Wyłącz edycję
+                        self.table.setItem(row, col, item)
 
         except Exception as e:
             print(f"Błąd podczas analizy: {str(e)}")
