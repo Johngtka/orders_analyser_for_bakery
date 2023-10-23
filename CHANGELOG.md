@@ -1,8 +1,11 @@
 <!-- @format -->
 
-### 1.0.0 (23.10.2023)
+### 0.0.8 (23.10.2023)
 
 ### Features:
+
+-   chore(release): v.0.0.8
+    ([6.](https://github.com/Johngtka/orders_analyser_for_bakery/commit/1a9b2917a77cf079d22c18846f70a243c11147c4))
 
 -   new layout of app and processing loader
     ([5.](https://github.com/Johngtka/orders_analyser_for_bakery/commit/b1011247aa3ed60718a0576d9ce0d620b2d5929f))
