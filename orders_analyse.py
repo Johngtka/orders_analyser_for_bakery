@@ -1,7 +1,8 @@
 import sys
 import pymysql
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QTableWidget, QTableWidgetItem, QFrame, QHeaderView
+from PyQt5.QtGui import QMovie
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QTableWidget, QTableWidgetItem, QFrame, QHeaderView, QLabel
 
 class OrderAnalyzerApp(QWidget):
     def __init__(self):
@@ -10,7 +11,8 @@ class OrderAnalyzerApp(QWidget):
         self.setWindowTitle("Orders Analyzer")
         self.setGeometry(100, 100, 600, 400)
 
-        self.analyze_button = QPushButton("Analyze Orders")
+        self.analyze_button = QPushButton("Daily Report")
+        
         self.table = QTableWidget()
         self.table.setColumnCount(4)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -19,56 +21,64 @@ class OrderAnalyzerApp(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setFocusPolicy(Qt.NoFocus)
         self.table.horizontalHeader().setHighlightSections(False)
+
+        frame = QFrame(self)
+        frame_layout = QVBoxLayout()
+        frame_layout.addWidget(self.analyze_button)
+        frame_layout.addWidget(self.table)
+        frame.setLayout(frame_layout)
         
-        frame = QFrame(self)  # Tworzenie pojemnika na elementy
-        frame.setLayout(QVBoxLayout())  # Ustawienie układu w pojemniku
-        frame.layout().addWidget(self.analyze_button)
-        frame.layout().addWidget(self.table)
-        
+        self.loading_label = QLabel(self)
+        self.loading_movie = QMovie("giphy.gif")  
+        self.loading_label.setMovie(self.loading_movie)
+        self.loading_label.setAlignment(Qt.AlignCenter)
+
         layout = QVBoxLayout(self)
-        layout.addWidget(frame)  # Dodanie pojemnika do układu głównego
+        layout.addWidget(frame)
+        layout.addWidget(self.loading_label)
         self.setLayout(layout)
 
         self.analyze_button.clicked.connect(self.analyze_orders)
 
-    
     def analyze_orders(self):
         self.analyze_button.setEnabled(False)
-        
-        # Logika analizy zamówień
+        self.loading_movie.start()
+        QTimer.singleShot(3000, self.process_data)
+
+    def process_data(self):
+        self.loading_movie.stop()
+        self.loading_label.clear()
+
         conn = pymysql.connect(
             host='localhost',
             user='root',
-            password='',  # Podaj hasło do swojej bazy danych
-            db='wypiekarnia'  # Zmień na nazwę Twojej bazy danych
+            password='',
+            db='wypiekarnia'
         )
         try:
             with conn.cursor() as cursor:
-                # Pobierz informacje o użytkownikach (imie, nazwisko, email)
                 cursor.execute("SELECT name, surname, email FROM klijeci")
                 users = cursor.fetchall()
                 results = []
 
                 for user in users:
-                    imie, nazwisko, email = user
+                    name, surName, email = user
                     cursor.execute(
                         "SELECT COUNT(id) FROM zamowienia WHERE email = %s", (email,))
                     total_orders = cursor.fetchone()[0]
-                    results.append([imie, nazwisko, email, total_orders])
+                    results.append([name, surName, email, total_orders])
 
-                # Wyczyść tabelę przed dodaniem nowych wyników
                 self.table.setRowCount(0)
-                
-                # Wypełnij tabelę nowymi wynikami
+
                 for row, data in enumerate(results):
                     self.table.insertRow(row)
                     for col, item in enumerate(data):
-                        item = QTableWidgetItem(str(item))  # Dodaj przecinek
-                        item.setFlags(item.flags() ^ Qt.ItemIsEditable)  # Wyłącz edycję
+                        item = QTableWidgetItem(str(item))
+                        item.setFlags(item.flags() ^ Qt.ItemIsEditable)
                         self.table.setItem(row, col, item)
 
         except Exception as e:
-            print(f"Błąd podczas analizy: {str(e)}")
+            print(f"An error has been ocurred while orders analyzing: {str(e)}")
         finally:
             conn.close()
         
