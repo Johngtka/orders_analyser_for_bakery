@@ -1,5 +1,12 @@
 <!-- @format -->
 
+### [0.0.10](https://github.com/Johngtka/orders_analyser_for_bakery/compare/v.0.0.8...v.0.0.10) (26.10.2023)
+
+### Fixes:
+
+-   fix: fixed code in app
+    ([10.](https://github.com/Johngtka/orders_analyser_for_bakery/commit/069d108aae69ef84181b6aec029e5b3d1dd624fc))
+
 ### 0.0.8 (23.10.2023)
 
 ### Features:
