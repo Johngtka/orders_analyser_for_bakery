@@ -17,7 +17,7 @@ class OrderAnalyzerApp(QWidget):
         self.table.setColumnCount(4)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QTableWidget.MultiSelection)  
-        self.table.setHorizontalHeaderLabels(["Name", "Surname", "Email", "Order Count"])
+        self.table.setHorizontalHeaderLabels(["Name", "Surname", "Login", "Order Count"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setFocusPolicy(Qt.NoFocus)
         self.table.horizontalHeader().setHighlightSections(False)
@@ -57,16 +57,16 @@ class OrderAnalyzerApp(QWidget):
         )
         try:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT name, surname, email FROM klijeci")
+                cursor.execute("SELECT name, surname, login FROM klijeci")
                 users = cursor.fetchall()
                 results = []
 
                 for user in users:
-                    name, surName, email = user
+                    name, surName, login = user
                     cursor.execute(
-                        "SELECT COUNT(id) FROM zamowienia WHERE email = %s", (email,))
+                        "SELECT COUNT(id) FROM zamowienia WHERE userLogin = %s", (login,))
                     total_orders = cursor.fetchone()[0]
-                    results.append([name, surName, email, total_orders])
+                    results.append([name, surName, login, total_orders])
 
                 self.table.setRowCount(0)
 
